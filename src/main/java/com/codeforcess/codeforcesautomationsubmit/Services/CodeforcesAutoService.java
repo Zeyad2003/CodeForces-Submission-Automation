@@ -53,6 +53,7 @@ public class CodeforcesAutoService {
             while(status.getText().contains("queue") || status.getText().contains("Running") ){
                 status = driver.findElement(By.className("status-cell"));
             }
+            
             WebElement time = driver.findElement(By.className("time-consumed-cell"));
             WebElement memory = driver.findElement(By.className("memory-consumed-cell"));
 
