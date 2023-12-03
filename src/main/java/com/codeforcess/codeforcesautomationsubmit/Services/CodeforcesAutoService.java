@@ -22,8 +22,8 @@ public class CodeforcesAutoService {
     WebDriver driver;
     WebDriverWait wait;
 
-    final String USER_NAME = "eagledev";
-    final String PASSWORD = "#01026759008";
+    final String USER_NAME = "YOUR USERNAME";
+    final String PASSWORD = "YOUR PASSWORD";
     final String PATH = "E:\\works\\Projects java\\codeforces-automation-sumtit\\src\\main\\resources\\CodeFile";
 
     Set<Cookie> cookieSet;
