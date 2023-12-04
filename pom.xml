@@ -11,8 +11,8 @@
     <groupId>com.codeforcess</groupId>
     <artifactId>codeforces-automation-submit</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>codeforces-automation-sumtit</name>
-    <description>codeforces-automation-sumtit</description>
+    <name>codeforces-automation-submit</name>
+    <description>codeforces-automation-submit</description>
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -22,17 +22,19 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-devtools</artifactId>-->
-<!--            <scope>runtime</scope>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

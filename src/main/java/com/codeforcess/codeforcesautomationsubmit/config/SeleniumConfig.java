@@ -1,4 +1,4 @@
-package com.codeforcess.codeforcesautomationsubmit.Config;
+package com.codeforcess.codeforcesautomationsubmit.config;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
