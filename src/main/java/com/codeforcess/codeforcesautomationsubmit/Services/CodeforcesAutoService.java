@@ -12,6 +12,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Set;
@@ -77,17 +80,25 @@ public class CodeforcesAutoService {
     private void submitCode(String problemCode , ProblemSubmitData data){
         try {
 
+            if(problemCode.isEmpty() || data.getCode().isEmpty() || data.getProgramTypeId() <= 0){
+                throw new RuntimeException("INVALID INPUT AT REQUEST BODY");
+            }
+
+            Files.writeString(Path.of(PATH) , data.getCode() , StandardOpenOption.TRUNCATE_EXISTING);
             // get submission elements
             WebElement submittedProblemCode = driver.findElement(By.name("submittedProblemCode"));
             Select lang = new Select(driver.findElement(By.name("programTypeId")));
             WebElement singlePageSubmitButton = driver.findElement(By.id("singlePageSubmitButton"));
-            WebElement textArea = driver.findElement(By.className("ace_text-input"));
-//            WebElement chooseFile = driver.findElement(By.className("sourceFile"));
+//            WebElement textArea = driver.findElement(By.className("ace_text-input"));
+            WebElement chooseFile = driver.findElement(By.name("sourceFile"));
+
+            System.out.println(data.getCode());
 
             // send data
             submittedProblemCode.sendKeys(problemCode);
-            textArea.sendKeys(data.getCode());
-//            chooseFile.sendKeys(PATH);
+//            textArea.clear();
+//            textArea.sendKeys(data.getCode());
+            chooseFile.sendKeys(PATH);
             lang.selectByValue(String.valueOf(data.getProgramTypeId()));
             singlePageSubmitButton.submit();
 
