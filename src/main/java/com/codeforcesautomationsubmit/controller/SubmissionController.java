@@ -1,8 +1,8 @@
-package com.codeforcess.codeforcesautomationsubmit.controller;
+package com.codeforcesautomationsubmit.controller;
 
-import com.codeforcess.codeforcesautomationsubmit.service.CodeforcesAutoService;
-import com.codeforcess.codeforcesautomationsubmit.models.ProblemSubmitData;
-import com.codeforcess.codeforcesautomationsubmit.models.ProblemSubmitResult;
+import com.codeforcesautomationsubmit.service.CodeforcesAutoService;
+import com.codeforcesautomationsubmit.models.ProblemSubmitData;
+import com.codeforcesautomationsubmit.models.ProblemSubmitResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

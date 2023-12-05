@@ -1,4 +1,4 @@
-package com.codeforcess.codeforcesautomationsubmit.exception;
+package com.codeforcesautomationsubmit.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

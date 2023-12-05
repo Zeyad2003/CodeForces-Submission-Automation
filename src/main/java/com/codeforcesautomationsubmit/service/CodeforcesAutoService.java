@@ -1,8 +1,8 @@
-package com.codeforcess.codeforcesautomationsubmit.service;
+package com.codeforcesautomationsubmit.service;
 
-import com.codeforcess.codeforcesautomationsubmit.exception.SubmitException;
-import com.codeforcess.codeforcesautomationsubmit.models.ProblemSubmitData;
-import com.codeforcess.codeforcesautomationsubmit.models.ProblemSubmitResult;
+import com.codeforcesautomationsubmit.exception.SubmitException;
+import com.codeforcesautomationsubmit.models.ProblemSubmitData;
+import com.codeforcesautomationsubmit.models.ProblemSubmitResult;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +20,6 @@ import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 
 @Service
 public class CodeforcesAutoService {
@@ -28,41 +27,33 @@ public class CodeforcesAutoService {
     private final WebDriver driver;
     private final WebDriverWait wait;
 
-    @Value("${codeforces.username}")
-    final String USER_NAME = "YOUR USERNAME";
+    @Value("${CodeForces.username}")
+    String USERNAME;
 
-    @Value("${codeforces.password}")
-    final String PASSWORD = "YOUR PASSWORD";
-    final String PATH = "E:\\works\\Projects java\\codeforces-automation-sumtit\\src\\main\\resources\\CodeFile";
-
-    Set<Cookie> cookieSet;
+    @Value("${CodeForces.password}")
+    String PASSWORD;
+    final String PATH = "../../main/resources/CodeFile";
 
     @Autowired
-    public CodeforcesAutoService(WebDriver driver){
+    public CodeforcesAutoService(WebDriver driver) {
         this.driver = driver;
-        wait = new WebDriverWait(driver , Duration.ofSeconds(15));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
-    public ProblemSubmitResult submit(String problemCode , ProblemSubmitData data){
+    public ProblemSubmitResult submit(String problemCode, ProblemSubmitData data) {
         try {
-
-            if(!isLogin()) {
-                login();
-            }
-            else {
-                driver.get("https://codeforces.com/problemset/submit");
-            }
+            verifyLogin();
 
             wait.until(driver -> driver.findElement(By.className("submit-form")));
 
-            submitCode(problemCode , data);
+            submitCode(problemCode, data);
 
             // getting status of submitting
             WebElement status = driver.findElement(By.className("status-cell"));
-            while(status.getText().contains("queue") || status.getText().contains("Running") ){
+            while (status.getText().contains("queue") || status.getText().contains("Running")) {
                 status = driver.findElement(By.className("status-cell"));
             }
-            
+
             WebElement time = driver.findElement(By.className("time-consumed-cell"));
             WebElement memory = driver.findElement(By.className("memory-consumed-cell"));
 
@@ -77,21 +68,20 @@ public class CodeforcesAutoService {
             res.setTime(time.getText());
 
             return res;
-        }
-        catch (Exception exception){
+        } catch (Exception exception) {
             System.out.println(exception.getMessage());
             throw new SubmitException("Submission Failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void submitCode(String problemCode , ProblemSubmitData data){
+    private void submitCode(String problemCode, ProblemSubmitData data) {
         try {
 
-            if(problemCode.isEmpty() || data.getSolutionCode().isEmpty() || data.getCompilerId() <= 0){
+            if (problemCode.isEmpty() || data.getSolutionCode().isEmpty() || data.getCompilerId() <= 0) {
                 throw new RuntimeException("INVALID INPUT AT REQUEST BODY");
             }
 
-            Files.writeString(Path.of(PATH) , data.getSolutionCode() , StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(Path.of(PATH), data.getSolutionCode(), StandardOpenOption.TRUNCATE_EXISTING);
             // get submission elements
             WebElement submittedProblemCode = driver.findElement(By.name("submittedProblemCode"));
             Select lang = new Select(driver.findElement(By.name("programTypeId")));
@@ -111,28 +101,34 @@ public class CodeforcesAutoService {
 
             wait.until(driver -> driver.findElement(By.className("status-frame-datatable")));
 
-        }catch (Exception exception){
+        } catch (Exception exception) {
             System.out.println(exception.getMessage());
             throw new SubmitException("FAil to Submission may be the code submitted before", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    private void login(){
+
+    private void login() {
         try {
             driver.get("https://codeforces.com/enter?back=/problemset/submit");
             WebElement userName = driver.findElement(By.name("handleOrEmail"));
             WebElement password = driver.findElement(By.name("password"));
             WebElement submit = driver.findElement(By.className("submit"));
-            userName.sendKeys(USER_NAME);
+            userName.sendKeys(USERNAME);
             password.sendKeys(PASSWORD);
             submit.submit();
-        }catch (Exception exception){
+        } catch (Exception exception) {
             System.out.println("FAIL TO LOGIN");
             throw new SubmitException("FAIL TO LOGIN", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
-    private boolean isLogin(){
+    private void verifyLogin() {
+        if (!isLogin()) login();
+        else driver.get("https://codeforces.com/problemset/submit");
+    }
+
+    private boolean isLogin() {
         Cookie cookie = driver.manage().getCookieNamed("X-User-Sha1");
         return cookie != null && !cookie.getValue().isEmpty();
     }

@@ -1,4 +1,4 @@
-package com.codeforcess.codeforcesautomationsubmit.models;
+package com.codeforcesautomationsubmit.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
