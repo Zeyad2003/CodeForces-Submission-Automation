@@ -1,13 +1,13 @@
-package com.codeforcess.codeforcesautomationsubmit;
+package com.codeforcesautomationsubmit;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CodeforcesAutomationSumtitApplication {
+public class CodeforcesAutomationSubmitApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CodeforcesAutomationSumtitApplication.class, args);
+        SpringApplication.run(CodeforcesAutomationSubmitApplication.class, args);
     }
 
 }
