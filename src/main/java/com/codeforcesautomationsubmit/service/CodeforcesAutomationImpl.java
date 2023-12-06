@@ -1,8 +1,8 @@
 package com.codeforcesautomationsubmit.service;
 
 import com.codeforcesautomationsubmit.exception.SubmitException;
-import com.codeforcesautomationsubmit.models.ProblemSubmitData;
-import com.codeforcesautomationsubmit.models.ProblemSubmitResult;
+import com.codeforcesautomationsubmit.models.SubmissionInfo;
+import com.codeforcesautomationsubmit.models.SubmissionResult;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
@@ -11,9 +11,9 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
-public class CodeforcesAutoService {
+public class CodeforcesAutomationImpl implements CodeforcesAutomation {
 
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -32,15 +32,17 @@ public class CodeforcesAutoService {
 
     @Value("${CodeForces.password}")
     String PASSWORD;
-    final String PATH = "../../main/resources/CodeFile";
+
+    final String PATH = "CodeFile";
 
     @Autowired
-    public CodeforcesAutoService(WebDriver driver) {
+    public CodeforcesAutomationImpl(WebDriver driver) {
         this.driver = driver;
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
-    public ProblemSubmitResult submit(String problemCode, ProblemSubmitData data) {
+    @Override
+    public SubmissionResult submit(String problemCode, SubmissionInfo data) {
         try {
             verifyLogin();
 
@@ -61,7 +63,7 @@ public class CodeforcesAutoService {
             System.out.println(memory.getText());
             System.out.println(memory.getText());
 
-            ProblemSubmitResult res = new ProblemSubmitResult();
+            SubmissionResult res = new SubmissionResult();
             res.setMemory(memory.getText());
             res.setVerdict(status.getText());
             res.setSubmitTime(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss a").format(LocalDateTime.now()));
@@ -74,28 +76,28 @@ public class CodeforcesAutoService {
         }
     }
 
-    private void submitCode(String problemCode, ProblemSubmitData data) {
+    private void submitCode(String problemCode, SubmissionInfo data) {
         try {
 
             if (problemCode.isEmpty() || data.getSolutionCode().isEmpty() || data.getCompilerId() <= 0) {
                 throw new RuntimeException("INVALID INPUT AT REQUEST BODY");
             }
 
-            Files.writeString(Path.of(PATH), data.getSolutionCode(), StandardOpenOption.TRUNCATE_EXISTING);
+            // Updated this line to read the file from the resources folder
+            String codeFilePath = new ClassPathResource(PATH).getFile().getPath();
+            Files.writeString(Path.of(codeFilePath), data.getSolutionCode(), StandardOpenOption.TRUNCATE_EXISTING);
+
             // get submission elements
             WebElement submittedProblemCode = driver.findElement(By.name("submittedProblemCode"));
             Select lang = new Select(driver.findElement(By.name("programTypeId")));
             WebElement singlePageSubmitButton = driver.findElement(By.id("singlePageSubmitButton"));
-//            WebElement textArea = driver.findElement(By.className("ace_text-input"));
             WebElement chooseFile = driver.findElement(By.name("sourceFile"));
 
             System.out.println(data.getSolutionCode());
 
             // send data
             submittedProblemCode.sendKeys(problemCode);
-//            textArea.clear();
-//            textArea.sendKeys(data.getCode());
-            chooseFile.sendKeys(PATH);
+            chooseFile.sendKeys(codeFilePath);
             lang.selectByValue(String.valueOf(data.getCompilerId()));
             singlePageSubmitButton.submit();
 
@@ -103,24 +105,27 @@ public class CodeforcesAutoService {
 
         } catch (Exception exception) {
             System.out.println(exception.getMessage());
-            throw new SubmitException("FAil to Submission may be the code submitted before", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new SubmitException("Fail to submit. The code may have been submitted before.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void login() {
+    @Override
+    public void login() {
         try {
             driver.get("https://codeforces.com/enter?back=/problemset/submit");
             WebElement userName = driver.findElement(By.name("handleOrEmail"));
             WebElement password = driver.findElement(By.name("password"));
-            WebElement submit = driver.findElement(By.className("submit"));
+            WebElement loginButton = driver.findElement(By.className("submit"));
+            WebElement rememberMe = driver.findElement(By.id("remember"));
+
             userName.sendKeys(USERNAME);
             password.sendKeys(PASSWORD);
-            submit.submit();
+            rememberMe.click();
+            loginButton.submit();
         } catch (Exception exception) {
             System.out.println("FAIL TO LOGIN");
             throw new SubmitException("FAIL TO LOGIN", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     private void verifyLogin() {
@@ -133,3 +138,4 @@ public class CodeforcesAutoService {
         return cookie != null && !cookie.getValue().isEmpty();
     }
 }
+

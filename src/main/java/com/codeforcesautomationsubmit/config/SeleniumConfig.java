@@ -15,7 +15,7 @@ public class SeleniumConfig {
 
     @Bean
     public WebDriver getDriver(){
-        WebDriverManager.chromedriver().setup();
+        WebDriverManager.chromedriver().browserVersion("119").setup();
         ChromeOptions options = new ChromeOptions();
         //options.addArguments("--headless"); // This line enables headless mode
         options.setBinary(braveBinaryPath);

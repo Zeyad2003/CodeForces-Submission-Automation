@@ -34,5 +34,4 @@ public class SubmitExceptionHandler {
         );
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }

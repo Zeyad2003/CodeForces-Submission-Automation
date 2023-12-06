@@ -1,8 +1,9 @@
 package com.codeforcesautomationsubmit.controller;
 
-import com.codeforcesautomationsubmit.service.CodeforcesAutoService;
-import com.codeforcesautomationsubmit.models.ProblemSubmitData;
-import com.codeforcesautomationsubmit.models.ProblemSubmitResult;
+import com.codeforcesautomationsubmit.service.CodeforcesAutomationImpl;
+import com.codeforcesautomationsubmit.models.SubmissionInfo;
+import com.codeforcesautomationsubmit.models.SubmissionResult;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/")
 public class SubmissionController {
-    private final CodeforcesAutoService service;
+    private final CodeforcesAutomationImpl service;
 
     @GetMapping
     public String welcomeMessage() {
@@ -20,7 +21,7 @@ public class SubmissionController {
     }
 
     @PostMapping("/submit/{problemCode}")
-    ResponseEntity<ProblemSubmitResult> submit(@PathVariable String problemCode, @RequestBody ProblemSubmitData data) {
+    ResponseEntity<SubmissionResult> submit(@PathVariable String problemCode, @RequestBody @Valid SubmissionInfo data) {
         return new ResponseEntity<>(service.submit(problemCode, data), HttpStatus.OK);
     }
 }
